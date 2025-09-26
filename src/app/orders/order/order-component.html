@@ -1,0 +1,37 @@
+<div style="padding-left: 10px">
+  @if (role === 'BASIC') {
+    <h3>Order was placed. The new order is:</h3>
+    <table style="width: 100%">
+      <tr>
+        <th>Transaction</th>
+        <th>Order state</th>
+        <th>Acquire Type</th>
+        <th>Items:</th>
+        <th>Total</th>
+        <th>Address</th>
+        <th>User</th>
+      </tr>
+
+      <tr>
+        <td>{{ newOrder().transaction }}</td>
+        <td>{{ newOrder().orderState }}</td>
+        <td>{{ newOrder().acquireType }}</td>
+        <td style="display: flex; flex-direction: column;">
+          @for (item of newOrder().shippingItems; track item.id) {
+            <span>{{ item.quantity }}x - {{ item.bike.model }}</span>
+          }
+        </td>
+        <td>{{ newOrder().totalPrice }} €</td>
+        <td>
+          <span>
+            {{ newOrder().shippingAddress.fullName }},
+            {{ newOrder().shippingAddress.address }},
+            {{ newOrder().shippingAddress.telephone }}.
+            {{ newOrder().shippingAddress.zipCode }}
+          </span>
+        </td>
+        <td>{{ newOrder().username }}</td>
+      </tr>
+    </table>
+  }
+</div>
