@@ -1,5 +1,5 @@
-import { Component, signal } from '@angular/core';
-import { Order } from '../order/order-component';
+import { Component, inject, OnInit, signal } from '@angular/core';
+import { OrderService } from '../order.service';
 
 @Component({
   selector: 'app-order-history',
@@ -7,6 +7,14 @@ import { Order } from '../order/order-component';
   templateUrl: './order-history-component.html',
   styleUrl: './order-history-component.scss'
 })
-export class OrderHistoryComponent {
-orders = signal<Order[]>([]);
+export class OrderHistoryComponent implements OnInit {
+  orderService = inject(OrderService);
+
+  orders = this.orderService.orderState;
+
+  ngOnInit(): void {
+    if(this.orderService.orderState().length === 0) {
+      this.orderService.loadOrderHistory();
+    }
+  }
 }

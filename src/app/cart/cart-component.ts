@@ -1,12 +1,7 @@
-import { Component, computed, signal } from '@angular/core';
-import { Bike } from '../bikes/bike';
-
-
-export interface CartItem {
-  id: number;
-  bike: Bike;
-  quantity: number;
-}
+import { Component, computed, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { Cart, CartItem } from './cart.models';
+import { CartService } from './cart.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-cart',
@@ -14,70 +9,50 @@ export interface CartItem {
   templateUrl: './cart-component.html',
   styleUrl: './cart-component.scss'
 })
-export class CartComponent {
-cartItems = signal<CartItem[]>([
-    {
-      id: 1,
-      bike: {
-        id: 1,
-        model: 'Mountain Master',
-        imageSource: 'mountain.png',
-        stock: 5,
-        details: 'Great for trails',
-        electric: false,
-        price: 799.99
-      },
-      quantity: 1
-    },
-    {
-      id: 2,
-      bike: {
-        id: 2,
-        model: 'Urban Rider',
-        imageSource: 'urban.png',
-        stock: 2,
-        details: 'Perfect for city commuting',
-        electric: true,
-        price: 1299.99
-      },
-      quantity: 2
-    }
-  ]);
+export class CartComponent implements OnInit {
 
-  // Derived signals
+  cartItems = computed(() => this.cartService.cartState());
+
+  cartService = inject(CartService);
+  router = inject(Router);
+
+  ngOnInit(): void {
+    this.cartService.getCart().subscribe(cart => {
+      this.cartService.cartState.set(cart);
+    });
+  }
+
   cartTotal = computed(() =>
-    this.cartItems().reduce((sum, item) => sum + item.bike.price * item.quantity, 0)
+    this.cartItems()?.cartItems.reduce((sum, item) => sum + item.bike.price * item.quantity, 0).toFixed(2)
   );
 
-  cartIsEmpty = computed(() => this.cartItems().length === 0);
+  cartIsEmpty = computed(() => this.cartItems()?.cartItems.length === 0);
 
-  // Actions
   removeItem(id: number) {
-    this.cartItems.update(items => items.filter(item => item.id !== id));
+    this.cartService.deleteCartItem(id).subscribe({
+      next: () => {
+        this.cartService.loadCart();
+      },
+      error: (err) => {
+        console.error('Error removing item from cart:', err);
+      }
+    });
   }
 
-  increaseQuantity(id: number) {
-    this.cartItems.update(items =>
-      items.map(item =>
-        item.id === id && item.quantity < item.bike.stock
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
-      )
-    );
-  }
-
-  decreaseQuantity(id: number) {
-    this.cartItems.update(items =>
-      items.map(item =>
-        item.id === id && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      )
-    );
+  updateQuantity(id: number, type: 'increase' | 'decrease') {
+    this.cartService.updateCartItemQuantity(id, type).subscribe({
+      next: () => {
+        this.cartService.getCart().subscribe(cart => {
+          this.cartService.cartState.set(cart);
+        });
+      },
+      error: (err) => {
+        console.error(`Error updating item quantity (${type}):`, err);
+      }
+    });
   }
 
   goToCheckout() {
-    console.log('Navigating to checkout...');
-    // TODO: this.router.navigate(['/checkout']);
+    this.router.navigate(['/checkout']);
   }
 }

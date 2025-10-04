@@ -1,6 +1,4 @@
-import { Component, signal } from '@angular/core';
-import { Bike } from '../../bikes/bike';
-
+import { Bike } from "../product/bike";
 
 export interface ShippingAddress {
   fullName: string;
@@ -25,14 +23,7 @@ export interface Order {
   username: string;
 }
 
-@Component({
-  selector: 'app-order',
-  imports: [],
-  templateUrl: './order-component.html',
-  styleUrl: './order-component.scss'
-})
-export class OrderComponent {
-role: 'BASIC' | 'MANAGER' | 'GUEST' = 'BASIC';
-
-  newOrder = signal<Order>({} as Order);
+export interface OrderRequest {
+  shippingAddress: ShippingAddress;
+  acquireType: 'buy' | 'rent';
 }

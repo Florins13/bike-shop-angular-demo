@@ -1,50 +1,26 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CartItem } from '../../cart/cart-component';
+import { OrderService } from '../order.service';
+import { CartService } from '../../cart/cart.service';
+import { OrderHistoryComponent } from "../order-history/order-history-component";
+import { OrderRequest } from '../order.models';
 
 @Component({
   selector: 'app-checkout',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, OrderHistoryComponent],
   templateUrl: './checkout-component.html',
   styleUrl: './checkout-component.scss'
 })
-export class CheckoutComponent {
- cartItems = signal<CartItem[]>([
-    {
-      id: 1,
-      bike: {
-        id: 1,
-        model: 'Mountain Master',
-        imageSource: 'mountain.png',
-        stock: 5,
-        details: 'Great for trails',
-        electric: false,
-        price: 799.99
-      },
-      quantity: 1
-    },
-    {
-      id: 2,
-      bike: {
-        id: 2,
-        model: 'Urban Rider',
-        imageSource: 'urban.png',
-        stock: 2,
-        details: 'Perfect for city commuting',
-        electric: true,
-        price: 1299.99
-      },
-      quantity: 2
-    }
-  ]);
+export class CheckoutComponent implements OnInit {
+  cartItems = computed(() => this.cartService.cartState()?.cartItems);
 
   // Derived totals
   cartTotal = computed(() =>
-    this.cartItems().reduce((sum, item) => sum + item.bike.price * item.quantity, 0)
+    this.cartItems()?.reduce((sum, item) => sum + item.bike.price * item.quantity, 0)
   );
 
   rentTotal = computed(() =>
-    this.cartItems().reduce((sum, item) => sum + (item.bike.price * item.quantity * 0.3), 0)
+    this.cartItems()?.reduce((sum, item) => sum + (item.bike.price * item.quantity * 0.3), 0)
   );
 
   // Acquire mode (buy or rent)
@@ -53,7 +29,7 @@ export class CheckoutComponent {
   // Form
   checkoutForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private orderService: OrderService, private cartService: CartService) {
     this.checkoutForm = this.fb.group({
       fullName: ['', Validators.required],
       address: ['', Validators.required],
@@ -67,16 +43,29 @@ export class CheckoutComponent {
     //   this.acquireMode.set(value);
     // });
   }
+  ngOnInit(): void {
+    if (!this.cartService.cartState()) {
+      this.cartService.loadCart();
+    }
+  }
 
   finaliseOrder() {
-    // if (this.checkoutForm.valid) {
-    //   console.log('Finalising order:', {
-    //     ...this.checkoutForm.value,
-    //     items: this.cartItems(),
-    //     total: this.acquireMode() === 'buy' ? this.cartTotal() : this.rentTotal()
-    //   });
-    //   // TODO: Send order to backend
-    // }
+    if (this.checkoutForm.valid) {
+      const orderRequest: OrderRequest = {
+        shippingAddress: this.checkoutForm.value,
+        acquireType: this.acquireMode
+      };
+      this.orderService.finaliseOrder(orderRequest).subscribe({
+        next: () => {
+          this.orderService.loadOrderHistory();
+          this.cartService.loadCart();
+          this.checkoutForm.reset();
+        },
+        error: (error) => {
+          console.error('Error finalising order:', error);
+        }
+      });
+    }
   }
 }
 
