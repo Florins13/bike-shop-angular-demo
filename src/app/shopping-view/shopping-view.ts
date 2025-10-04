@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { BikeListComponent } from "../product/bike-list/bike-list-component";
 import { CartComponent } from "../cart/cart-component";
 
@@ -6,7 +6,8 @@ import { CartComponent } from "../cart/cart-component";
   selector: 'app-shopping-view',
   imports: [BikeListComponent, CartComponent],
   templateUrl: './shopping-view.html',
-  styleUrls: ['./shopping-view.scss']
+  styleUrls: ['./shopping-view.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ShoppingView {
 

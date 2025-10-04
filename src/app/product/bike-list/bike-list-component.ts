@@ -13,7 +13,7 @@ import { CartService } from '../../cart/cart.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BikeListComponent implements OnInit{
-  role: 'BASIC' | 'MANAGER' | 'GUEST' = 'BASIC'; // can be set from auth service
+  role: 'BASIC' | 'MANAGER' | 'GUEST' = 'BASIC';
   searchTerm: string = '';
 
   bikeService = inject(BikeService);

@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { OrderService } from '../order.service';
 import { CartService } from '../../cart/cart.service';
@@ -9,12 +9,12 @@ import { OrderRequest } from '../order.models';
   selector: 'app-checkout',
   imports: [ReactiveFormsModule, OrderHistoryComponent],
   templateUrl: './checkout-component.html',
-  styleUrl: './checkout-component.scss'
+  styleUrl: './checkout-component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CheckoutComponent implements OnInit {
   cartItems = computed(() => this.cartService.cartState()?.cartItems);
 
-  // Derived totals
   cartTotal = computed(() =>
     this.cartItems()?.reduce((sum, item) => sum + item.bike.price * item.quantity, 0)
   );
@@ -23,10 +23,8 @@ export class CheckoutComponent implements OnInit {
     this.cartItems()?.reduce((sum, item) => sum + (item.bike.price * item.quantity * 0.3), 0)
   );
 
-  // Acquire mode (buy or rent)
   acquireMode: 'buy' | 'rent' = 'buy';
 
-  // Form
   checkoutForm: FormGroup;
 
   constructor(private fb: FormBuilder, private orderService: OrderService, private cartService: CartService) {
@@ -38,10 +36,6 @@ export class CheckoutComponent implements OnInit {
       acquire: [this.acquireMode]
     });
 
-    // Sync acquire signal with form control
-    // this.checkoutForm.get('acquire')?.valueChanges.subscribe(value => {
-    //   this.acquireMode.set(value);
-    // });
   }
   ngOnInit(): void {
     if (!this.cartService.cartState()) {

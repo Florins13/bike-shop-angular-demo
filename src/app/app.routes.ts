@@ -5,10 +5,7 @@ import { OrderHistoryComponent } from './orders/order-history/order-history-comp
 import { ShoppingView } from './shopping-view/shopping-view';
 
 export const routes: Routes = [
-    {
-        path: 'login',
-        component: LoginComponent
-    },
+    { path: 'login', component: LoginComponent},
     { path: 'shop', component: ShoppingView },
     { path: 'checkout', component: CheckoutComponent },
     { path: 'orders', component: OrderHistoryComponent },

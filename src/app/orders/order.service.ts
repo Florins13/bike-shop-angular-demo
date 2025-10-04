@@ -5,8 +5,6 @@ import { Order, OrderRequest } from './order.models';
 
 @Injectable({ providedIn: 'root' })
 export class OrderService {
-
-
   private readonly apiUrl = 'http://localhost:8080';
   orderState: WritableSignal<Order[]> = signal([]);
 

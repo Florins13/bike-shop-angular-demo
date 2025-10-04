@@ -1,5 +1,4 @@
-import { Component, computed, inject, OnInit, signal, WritableSignal } from '@angular/core';
-import { Cart, CartItem } from './cart.models';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { CartService } from './cart.service';
 import { Router } from '@angular/router';
 
@@ -7,7 +6,8 @@ import { Router } from '@angular/router';
   selector: 'app-cart',
   imports: [],
   templateUrl: './cart-component.html',
-  styleUrl: './cart-component.scss'
+  styleUrl: './cart-component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CartComponent implements OnInit {
 
