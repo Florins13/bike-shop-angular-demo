@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { OrderHistoryComponent } from './order-history-component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 describe('OrderHistory', () => {
   let component: OrderHistoryComponent;
@@ -8,7 +10,8 @@ describe('OrderHistory', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [OrderHistoryComponent]
+      imports: [OrderHistoryComponent],
+            providers: [provideZonelessChangeDetection(), provideHttpClient()]
     })
     .compileComponents();
 

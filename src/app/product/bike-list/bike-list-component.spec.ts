@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BikeListComponent } from './bike-list-component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 describe('BikeList', () => {
   let component: BikeListComponent;
@@ -8,7 +10,8 @@ describe('BikeList', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BikeListComponent]
+      imports: [BikeListComponent],
+      providers: [provideZonelessChangeDetection(), provideHttpClient()]
     })
     .compileComponents();
 
